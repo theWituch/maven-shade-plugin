@@ -409,8 +409,12 @@ public class ShadeMojo
         Set<File> testArtifacts = new LinkedHashSet<>();
         Set<File> testSourceArtifacts = new LinkedHashSet<>();
 
+        ArtifactId inputArtifactId =
+            inputArtifact == null ? new ArtifactId( project.getArtifact() ) : new ArtifactId( inputArtifact );
+        getLog().debug( " Input artifact = " + inputArtifactId );
+
         ArtifactSelector artifactSelector =
-            new ArtifactSelector( project.getArtifact(), artifactSet, shadedGroupFilter );
+            new ArtifactSelector( inputArtifactId, artifactSet, shadedGroupFilter );
 
         if ( artifactSelector.isSelected( project.getArtifact() ) && !"pom".equals( project.getArtifact().getType() ) )
         {
