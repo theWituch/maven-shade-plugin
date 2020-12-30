@@ -383,6 +383,8 @@ public class ShadeMojo
     @Parameter( defaultValue = "false" )
     private boolean shadeTestJar;
 
+    private HashMap<ArtifactId, Artifact> availableInputArtifacts = new HashMap<>();
+
     /**
      * @since 1.6
      */
@@ -408,6 +410,12 @@ public class ShadeMojo
         Set<File> sourceArtifacts = new LinkedHashSet<>();
         Set<File> testArtifacts = new LinkedHashSet<>();
         Set<File> testSourceArtifacts = new LinkedHashSet<>();
+
+        availableInputArtifacts.put( new ArtifactId( project.getArtifact() ), project.getArtifact() );
+        for ( Artifact artifact : project.getAttachedArtifacts() )
+        {
+            availableInputArtifacts.put( new ArtifactId( artifact ), artifact );
+        }
 
         ArtifactId inputArtifactId =
             inputArtifact == null ? new ArtifactId( project.getArtifact() ) : new ArtifactId( inputArtifact );
