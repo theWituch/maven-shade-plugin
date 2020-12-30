@@ -145,6 +145,15 @@ public class ShadeMojo
     protected ArtifactResolver artifactResolver;
 
     /**
+     * Input artifact denoted by composite identifiers of the general form
+     * <code>groupId:artifactId:type:classifier</code>.
+     * <p/>
+     * This artifact will be used as base artifact of shaded jar.
+     */
+    @Parameter( defaultValue = "${project.groupId}:${project.artifactId}" )
+    private String inputArtifact;
+
+    /**
      * Artifacts to include/exclude from the final artifact. Artifacts are denoted by composite identifiers of the
      * general form <code>groupId:artifactId:type:classifier</code>. Since version 1.3, the wildcard characters '*' and
      * '?' can be used within the sub parts of those composite identifiers to do pattern matching. For convenience, the
