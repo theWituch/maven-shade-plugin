@@ -19,6 +19,7 @@ package org.apache.maven.plugins.shade.mojo;
  * under the License.
  */
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
 import org.codehaus.plexus.util.SelectorUtils;
@@ -117,6 +118,11 @@ class ArtifactId
     private boolean match( String str, String pattern )
     {
         return SelectorUtils.match( pattern, str );
+    }
+
+    public String toString()
+    {
+        return StringUtils.join( new String[] { groupId, artifactId, type, classifier }, ':' );
     }
 
 }

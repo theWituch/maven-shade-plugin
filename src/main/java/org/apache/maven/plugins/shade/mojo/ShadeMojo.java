@@ -402,6 +402,8 @@ public class ShadeMojo
     public void execute()
         throws MojoExecutionException
     {
+        getLog().debug( " Project artifact   = " + project.getArtifact() );
+        getLog().debug( " Attached artifacts = " + project.getAttachedArtifacts() );
 
         setupHintedShader();
 
@@ -434,6 +436,7 @@ public class ShadeMojo
                     + "input artifact does not exist." );
             }
 
+            getLog().info( "Using " + input.getId() + " as input artifact" );
             artifacts.add( input.getFile() );
 
             if ( createSourcesJar )
@@ -643,7 +646,9 @@ public class ShadeMojo
         getLog().error( "- You have bound the goal to a lifecycle phase before \"package\". Please" );
         getLog().error( "  remove this binding from your POM such that the goal will be run in" );
         getLog().error( "  the proper phase." );
-        getLog().error( "- You removed the configuration of the maven-jar-plugin that produces the main artifact." );
+        getLog().error( "- You removed the configuration of the maven-jar-plugin that produces" );
+        getLog().error( "  the main artifact." );
+        getLog().error( "- You wrongly specified input artifact or input artifact was not produced." );
     }
 
     private ShadeRequest shadeRequest( String shade, Set<File> artifacts, File outputJar, List<Filter> filters,
