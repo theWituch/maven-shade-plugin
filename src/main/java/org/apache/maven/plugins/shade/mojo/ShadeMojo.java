@@ -424,16 +424,17 @@ public class ShadeMojo
         ArtifactSelector artifactSelector =
             new ArtifactSelector( inputArtifactId, artifactSet, shadedGroupFilter );
 
-        if ( artifactSelector.isSelected( project.getArtifact() ) && !"pom".equals( project.getArtifact().getType() ) )
+        if ( artifactSelector.isSelected( inputArtifactId ) && !"pom".equals( inputArtifactId.getType() ) )
         {
-            if ( invalidMainArtifact() )
+            Artifact input = getInputArtifact( inputArtifactId );
+            if ( !isValidArtifact( input ) )
             {
                 createErrorOutput();
                 throw new MojoExecutionException( "Failed to create shaded artifact, "
-                    + "project main artifact does not exist." );
+                    + "input artifact does not exist." );
             }
 
-            artifacts.add( project.getArtifact().getFile() );
+            artifacts.add( input.getFile() );
 
             if ( createSourcesJar )
             {
@@ -783,9 +784,21 @@ public class ShadeMojo
         }
     }
 
-    private boolean invalidMainArtifact()
+    private Artifact getInputArtifact( ArtifactId artifactid )
     {
-        return project.getArtifact().getFile() == null || !project.getArtifact().getFile().isFile();
+        for ( ArtifactId aId : availableInputArtifacts.keySet() )
+        {
+            if ( aId.matches( artifactid ) )
+            {
+                return availableInputArtifacts.get( aId );
+            }
+        }
+        return null;
+    }
+
+    private boolean isValidArtifact( Artifact artifact )
+    {
+        return artifact != null && artifact.getFile() != null && artifact.getFile().isFile();
     }
 
     private void replaceFile( File oldFile, File newFile )
