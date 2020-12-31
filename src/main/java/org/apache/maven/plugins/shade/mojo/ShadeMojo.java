@@ -467,6 +467,11 @@ public class ShadeMojo
         File testJar = shadedTestArtifactFileWithClassifier();
         File testSourcesJar = shadedTestSourceArtifactFileWithClassifier();
 
+        getLog().debug( " OutputJar = " + outputJar );
+        getLog().debug( " SourcesJar = " + sourcesJar );
+        getLog().debug( " TestJar = " + testJar );
+        getLog().debug( " TestSourcesJar = " + testSourcesJar );
+
         // Now add our extra resources
         try
         {
