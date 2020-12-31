@@ -150,7 +150,7 @@ public class ShadeMojo
      * <p/>
      * This artifact will be used as base artifact of shaded jar.
      */
-    @Parameter( defaultValue = "${project.groupId}:${project.artifactId}" )
+    @Parameter
     private String inputArtifact;
 
     /**
@@ -383,8 +383,6 @@ public class ShadeMojo
     @Parameter( defaultValue = "false" )
     private boolean shadeTestJar;
 
-    private HashMap<ArtifactId, Artifact> availableInputArtifacts = new HashMap<>();
-
     /**
      * @since 1.6
      */
@@ -413,14 +411,9 @@ public class ShadeMojo
         Set<File> testArtifacts = new LinkedHashSet<>();
         Set<File> testSourceArtifacts = new LinkedHashSet<>();
 
-        availableInputArtifacts.put( new ArtifactId( project.getArtifact() ), project.getArtifact() );
-        for ( Artifact artifact : project.getAttachedArtifacts() )
-        {
-            availableInputArtifacts.put( new ArtifactId( artifact ), artifact );
-        }
-
         ArtifactId inputArtifactId =
             inputArtifact == null ? new ArtifactId( project.getArtifact() ) : new ArtifactId( inputArtifact );
+        getLog().debug( " Input artifact = " + inputArtifactId );
         getLog().debug( " Input artifact = " + inputArtifactId );
 
         ArtifactSelector artifactSelector =
@@ -478,7 +471,7 @@ public class ShadeMojo
         // Now add our extra resources
         try
         {
-            List<Filter> filters = getFilters();
+            List<Filter> filters = getFilters( input );
 
             List<Relocator> relocators = getRelocators();
 
@@ -525,7 +518,7 @@ public class ShadeMojo
                 if ( finalName != null && finalName.length() > 0 //
                     && !finalName.equals( project.getBuild().getFinalName() ) )
                 {
-                    String finalFileName = finalName + "." + project.getArtifact().getArtifactHandler().getExtension();
+                    String finalFileName = finalName + "." + input.getArtifactHandler().getExtension();
                     File finalFile = new File( outputDirectory, finalFileName );
                     replaceFile( finalFile, outputJar );
                     outputJar = finalFile;
@@ -562,7 +555,7 @@ public class ShadeMojo
                 if ( shadedArtifactAttached )
                 {
                     getLog().info( "Attaching shaded artifact." );
-                    projectHelper.attachArtifact( project, project.getArtifact().getType(), shadedClassifierName,
+                    projectHelper.attachArtifact( project, input.getType(), shadedClassifierName,
                                                   outputJar );
                     if ( createSourcesJar )
                     {
@@ -585,7 +578,7 @@ public class ShadeMojo
                 else if ( !renamed )
                 {
                     getLog().info( "Replacing original artifact with shaded artifact." );
-                    File originalArtifact = project.getArtifact().getFile();
+                    File originalArtifact = input.getFile();
                     if ( originalArtifact != null )
                     {
                         replaceFile( originalArtifact, outputJar );
@@ -789,16 +782,21 @@ public class ShadeMojo
         }
     }
 
-    private Artifact getInputArtifact( ArtifactId artifactid )
+    private Artifact getInputArtifact()
     {
-        for ( ArtifactId aId : availableInputArtifacts.keySet() )
+        if ( inputArtifact != null )
         {
-            if ( aId.matches( artifactid ) )
+            ArtifactId inputArtifactId = new ArtifactId( inputArtifact );
+            for ( Artifact artifact : project.getAttachedArtifacts() )
             {
-                return availableInputArtifacts.get( aId );
+                if ( new ArtifactId( artifact ).matches( inputArtifactId ) )
+                {
+                    return artifact;
+                }
             }
         }
-        return null;
+
+        return project.getArtifact();
     }
 
     private boolean isValidArtifact( Artifact artifact )
@@ -919,7 +917,7 @@ public class ShadeMojo
         return Arrays.asList( transformers );
     }
 
-    private List<Filter> getFilters()
+    private List<Filter> getFilters( Artifact input )
         throws MojoExecutionException
     {
         List<Filter> filters = new ArrayList<>();
@@ -929,7 +927,7 @@ public class ShadeMojo
         {
             Map<Artifact, ArtifactId> artifacts = new HashMap<>();
 
-            artifacts.put( project.getArtifact(), new ArtifactId( project.getArtifact() ) );
+            artifacts.put( input, new ArtifactId( input ) );
 
             for ( Artifact artifact : project.getArtifacts() )
             {
@@ -985,11 +983,11 @@ public class ShadeMojo
 
         if ( minimizeJar )
         {
-            getLog().info( "Minimizing jar " + project.getArtifact() );
+            getLog().info( "Minimizing jar " + input );
 
             try
             {
-                filters.add( new MinijarFilter( project, getLog(), simpleFilters ) );
+                filters.add( new MinijarFilter( project, input, getLog(), simpleFilters ) );
             }
             catch ( IOException e )
             {
@@ -1002,7 +1000,7 @@ public class ShadeMojo
 
     private File shadedArtifactFileWithClassifier()
     {
-        Artifact artifact = project.getArtifact();
+        Artifact artifact = getInputArtifact();
         final String shadedName = shadedArtifactId + "-" + artifact.getVersion() + "-" + shadedClassifierName + "."
             + artifact.getArtifactHandler().getExtension();
         return new File( outputDirectory, shadedName );
@@ -1020,7 +1018,7 @@ public class ShadeMojo
 
     private File shadedArtifactFileWithClassifier( String classifier )
     {
-        Artifact artifact = project.getArtifact();
+        Artifact artifact = getInputArtifact();
         final String shadedName = shadedArtifactId + "-" + artifact.getVersion() + "-" + shadedClassifierName
             + "-" + classifier + "." + artifact.getArtifactHandler().getExtension();
         return new File( outputDirectory, shadedName );
@@ -1043,7 +1041,7 @@ public class ShadeMojo
 
     private File shadedArtifactFile( String classifier )
     {
-        Artifact artifact = project.getArtifact();
+        Artifact artifact = getInputArtifact();
 
         String shadedName;
 

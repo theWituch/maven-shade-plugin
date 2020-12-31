@@ -74,10 +74,10 @@ public class MinijarFilter
      * @param log {@link Log}
      * @throws IOException in case of error.
      */
-    public MinijarFilter( MavenProject project, Log log )
+    public MinijarFilter( MavenProject project, Artifact input, Log log )
         throws IOException
     {
-        this( project, log, Collections.<SimpleFilter>emptyList() );
+        this( project, input, log, Collections.<SimpleFilter>emptyList() );
     }
 
     /**
@@ -87,12 +87,12 @@ public class MinijarFilter
      * @throws IOException in case of errors.
      * @since 1.6
      */
-    public MinijarFilter( MavenProject project, Log log, List<SimpleFilter> simpleFilters )
+    public MinijarFilter( MavenProject project, Artifact input, Log log, List<SimpleFilter> simpleFilters )
         throws IOException
     {
       this.log = log;
 
-      File artifactFile = project.getArtifact().getFile();
+      File artifactFile = input.getFile();
 
         if ( artifactFile != null )
         {

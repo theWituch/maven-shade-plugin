@@ -70,7 +70,7 @@ public class MinijarFilterTest
 
         Log log = mock( Log.class );
 
-        MinijarFilter mf = new MinijarFilter( mavenProject, log );
+        MinijarFilter mf = new MinijarFilter( mavenProject, mavenProject.getArtifact(), log );
 
         mf.finished();
 
@@ -92,7 +92,7 @@ public class MinijarFilterTest
 
         Log log = mock( Log.class );
 
-        MinijarFilter mf = new MinijarFilter( mavenProject, log );
+        MinijarFilter mf = new MinijarFilter( mavenProject, mavenProject.getArtifact(), log );
 
         mf.finished();
 

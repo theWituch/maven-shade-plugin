@@ -250,9 +250,9 @@ public class ShadeMojoTest
         sessionField.set( mojo, mock( MavenSession.class ) );
 
         // invoke getFilters()
-        Method getFilters = ShadeMojo.class.getDeclaredMethod( "getFilters" );
+        Method getFilters = ShadeMojo.class.getDeclaredMethod( "getFilters", Artifact.class );
         getFilters.setAccessible( true );
-        List<Filter> filters = (List<Filter>) getFilters.invoke( mojo);
+        List<Filter> filters = (List<Filter>) getFilters.invoke( mojo, artifact );
 
         // assertions - there must be one filter
         assertEquals( 1, filters.size() );
