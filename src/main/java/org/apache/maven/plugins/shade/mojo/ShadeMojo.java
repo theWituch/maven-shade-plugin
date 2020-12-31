@@ -1000,8 +1000,19 @@ public class ShadeMojo
     private File shadedArtifactFileWithClassifier()
     {
         Artifact artifact = getInputArtifact();
-        final String shadedName = shadedArtifactId + "-" + artifact.getVersion() + "-" + shadedClassifierName + "."
-            + artifact.getArtifactHandler().getExtension();
+
+        final String shadedName;
+        if ( artifact.hasClassifier() )
+        {
+            shadedName = shadedArtifactId + "-" + artifact.getVersion() + "-" + artifact.getClassifier() + "-"
+                + shadedClassifierName + "." + artifact.getArtifactHandler().getExtension();
+        }
+        else
+        {
+            shadedName = shadedArtifactId + "-" + artifact.getVersion() + "-" + shadedClassifierName + "."
+                + artifact.getArtifactHandler().getExtension();
+        }
+
         return new File( outputDirectory, shadedName );
     }
 
@@ -1018,8 +1029,19 @@ public class ShadeMojo
     private File shadedArtifactFileWithClassifier( String classifier )
     {
         Artifact artifact = getInputArtifact();
-        final String shadedName = shadedArtifactId + "-" + artifact.getVersion() + "-" + shadedClassifierName
-            + "-" + classifier + "." + artifact.getArtifactHandler().getExtension();
+
+        final String shadedName;
+        if ( artifact.hasClassifier() )
+        {
+            shadedName = shadedArtifactId + "-" + artifact.getVersion() + "-" + artifact.getClassifier() + "-"
+                + shadedClassifierName + "-" + classifier + "." + artifact.getArtifactHandler().getExtension();
+        }
+        else
+        {
+            shadedName = shadedArtifactId + "-" + artifact.getVersion() + "-" + shadedClassifierName + "-" + classifier
+                + "." + artifact.getArtifactHandler().getExtension();
+        }
+
         return new File( outputDirectory, shadedName );
     }
 
